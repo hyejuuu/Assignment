@@ -82,11 +82,7 @@ extension SearchViewController: MKLocalSearchCompleterDelegate {
     }
 }
 
-extension SearchViewController: UITableViewDelegate {
-    
-}
-
-extension SearchViewController: UITableViewDataSource {
+extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
 
     func tableView(_ tableView: UITableView,
                    numberOfRowsInSection section: Int) -> Int {
@@ -111,7 +107,7 @@ extension SearchViewController: UITableViewDataSource {
         let search = MKLocalSearch(request: searchRequest)
         search.start { [weak self] response, error in
             guard let coordinate = response?.mapItems[0].placemark.coordinate,
-                let presentingVC = self?.presentingViewController as? CitysViewController else {
+                let presentingVC = self?.presentingViewController as? CitiesViewController else {
                 return
             }
             

@@ -22,14 +22,11 @@ class WeatherServiceImp: WeatherService {
     func requestWeatherWith(latitude: CLLocationDegrees,
                             longitude: CLLocationDegrees,
                             completion: @escaping (Result<WeatherData, Error>) -> Void) {
-        var urlComponent = URLComponents(string: baseURL)
-        urlComponent?.path = "/data/2.5/weather"
-        urlComponent?.queryItems = [URLQueryItem(name: "lat",
-                                                 value: String(latitude)),
-                                    URLQueryItem(name: "lon",
-                                                 value: String(longitude)),
-                                    URLQueryItem(name: "APPID",
-                                                 value: "9da3ad8a03f0757943105b118dc14e63")]
+        var urlComponent = WeatherAPI.weather.urlComponents
+        urlComponent?.queryItems?.insert(URLQueryItem(name: "lat",
+                                                      value: String(latitude)), at: 0)
+        urlComponent?.queryItems?.insert(URLQueryItem(name: "lon",
+                                                      value: String(longitude)), at: 0)
         
         guard let url = urlComponent?.url,
             let request

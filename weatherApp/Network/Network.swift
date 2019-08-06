@@ -8,8 +8,6 @@
 
 import Foundation
 
-let baseURL = "https://api.openweathermap.org"
-
 class NetworkImp: Network {
     let session = URLSession.shared
     

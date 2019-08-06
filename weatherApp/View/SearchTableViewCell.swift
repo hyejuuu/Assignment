@@ -8,13 +8,9 @@
 
 import UIKit
 
-protocol TouchButtonDelegate: class {
-    func presentSearchController()
-}
-
 class SearchTableViewCell: UITableViewCell {
-
-    weak var delegate: TouchButtonDelegate?
+    
+    var searchButtonDelegate: (()->())?
     
     lazy var addCityButton: UIButton = {
         let button = UIButton()
@@ -52,7 +48,11 @@ class SearchTableViewCell: UITableViewCell {
     }
     
     @objc private func presentSearchViewController() {
-        delegate?.presentSearchController()
+        guard let searchButtonDelegate = searchButtonDelegate else {
+            return
+        }
+        
+        searchButtonDelegate()
     }
 
 }

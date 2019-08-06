@@ -9,7 +9,7 @@
 import UIKit
 import CoreLocation
 
-class ViewController: UIViewController {
+class MainWeatherViewController: UIViewController {
     let locationManager = CLLocationManager()
     var location = CLLocationCoordinate2D()
     var weatherData: WeatherData?
@@ -91,7 +91,7 @@ class ViewController: UIViewController {
         
         if CLLocationManager.locationServicesEnabled() {
             locationManager.delegate = self
-            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+            locationManager.desiredAccuracy = kCLLocationAccuracyKilometer
             locationManager.startUpdatingLocation()
         }
     }
@@ -206,16 +206,12 @@ class ViewController: UIViewController {
     }
     
     @objc private func touchUpMoveToListButton() {
-        present(CitysViewController(), animated: true)
+        present(CitiesViewController(), animated: true)
     }
 
 }
 
-extension ViewController: UICollectionViewDelegate {
-    
-}
-
-extension ViewController: UICollectionViewDataSource {
+extension MainWeatherViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 2
     }
@@ -273,14 +269,13 @@ extension ViewController: UICollectionViewDataSource {
                 let sunsetTime = timeFormatter.string(from: sunsetDate)
                 cell.valueString = [sunriseTime, sunsetTime]
             case 1:
-                // 방향 설정
                 guard let deg = weatherData?.wind?.deg,
                     let speed = weatherData?.wind?.speed,
                     let humidity = weatherData?.main?.humidity else {
                     return cell
                 }
                 
-                cell.valueString = ["\(deg) \(Int(speed))m/s", "\(humidity)%"]
+                cell.valueString = ["\(deg)° \(Int(speed))m/s", "\(humidity)%"]
             case 2:
                 guard let precipitation = weatherData?.rain?.threeHour,
                     let pressure = weatherData?.main?.pressure else {
@@ -342,7 +337,7 @@ extension ViewController: UICollectionViewDataSource {
     }
 }
 
-extension ViewController: UICollectionViewDelegateFlowLayout {
+extension MainWeatherViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         referenceSizeForHeaderInSection section: Int) -> CGSize {
@@ -364,14 +359,58 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
     }
 }
 
-extension ViewController: CLLocationManagerDelegate {
+extension MainWeatherViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager,
                          didUpdateLocations locations: [CLLocation]) {
         guard let locationValue = manager.location?.coordinate else {
             return
         }
+        manager.stopUpdatingLocation()
+        
         location = locationValue
-        locationManager.delegate = nil
         requestData()
+    }
+    
+    func locationManager(_ manager: CLLocationManager,
+                         didChangeAuthorization status: CLAuthorizationStatus) {
+        switch status {
+        case .notDetermined:
+            locationManager.requestAlwaysAuthorization()
+            break
+        case .authorizedWhenInUse:
+            locationManager.startUpdatingLocation()
+            break
+        case .authorizedAlways:
+            locationManager.startUpdatingLocation()
+            break
+        case .restricted, .denied:
+            let alertController
+                = UIAlertController(title: "Notice",
+                                    message: "위치 서비스를 사용할 수 없습니다. 위치 서비스를 켜주세요",
+                                    preferredStyle: .alert)
+            
+            let moveToSettingAction
+                = UIAlertAction(title: "설정으로 이동",
+                                style: .destructive) { (_) in
+                guard let settingURL
+                    = URL(string: UIApplication.openSettingsURLString) else { return }
+                
+                if UIApplication.shared.canOpenURL(settingURL) {
+                    UIApplication.shared.open(settingURL)
+                }
+            }
+            
+            let cancelAction = UIAlertAction(title: "취소",
+                                             style: .cancel)
+            
+            alertController.addAction(moveToSettingAction)
+            alertController.addAction(cancelAction)
+            
+            present(alertController,
+                    animated: true)
+            break
+        default:
+            break
+        }
     }
 }

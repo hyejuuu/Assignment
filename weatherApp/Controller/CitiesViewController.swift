@@ -9,7 +9,7 @@
 import UIKit
 import CoreLocation
 
-class CitysViewController: UIViewController {
+class CitiesViewController: UIViewController {
     private var citys: [WeatherData] = []
     
     private let semaphore = DispatchSemaphore(value: 1)
@@ -114,12 +114,17 @@ class CitysViewController: UIViewController {
     func reloadSubview() {
         requestData(LocationCache.locations[LocationCache.locations.endIndex - 1])
     }
+    
+    func presentSearchController() {
+        present(SearchViewController(),
+                animated: true)
+    }
 }
 
-extension CitysViewController: UITableViewDelegate {
+extension CitiesViewController: UITableViewDelegate {
 }
 
-extension CitysViewController: UITableViewDataSource {
+extension CitiesViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView,
                    numberOfRowsInSection section: Int) -> Int {
         return citys.count + 1
@@ -135,7 +140,7 @@ extension CitysViewController: UITableViewDataSource {
                                                     return .init()
             }
             
-            cell.delegate = self
+            cell.searchButtonDelegate = presentSearchController
             
             return cell
         default:
@@ -160,7 +165,7 @@ extension CitysViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView,
                    didSelectRowAt indexPath: IndexPath) {
         if indexPath.row != citys.count {
-            guard let presenting = presentingViewController as? ViewController else {
+            guard let presenting = presentingViewController as? MainWeatherViewController else {
                 return
             }
             
@@ -168,12 +173,5 @@ extension CitysViewController: UITableViewDataSource {
             presenting.reloadSubview()
             dismiss(animated: true)
         }
-    }
-}
-
-extension CitysViewController: TouchButtonDelegate {
-    func presentSearchController() {
-        present(SearchViewController(),
-                animated: true)
     }
 }

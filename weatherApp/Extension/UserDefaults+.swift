@@ -20,7 +20,6 @@ extension UserDefaults {
                 throw error
             }
         }
-        
 
         set(data, forKey: forKey)
      
