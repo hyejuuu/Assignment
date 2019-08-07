@@ -195,7 +195,9 @@ class MainWeatherViewController: UIViewController {
                     UIApplication.shared.isNetworkActivityIndicatorVisible = false
                 }
             case .failure(let error):
-                print(error)
+                self?.indicatorView.indicatorStopAnimating()
+                UIApplication.shared.isNetworkActivityIndicatorVisible = false
+                assertionFailure(error.localizedDescription)
                 return
             }
         }

@@ -20,7 +20,9 @@ class NetworkImp: Network {
             }
             
             guard let data = data else {
-                completion(.failure(NSError()))
+                completion(.failure(NSError(domain: "data is nil",
+                                            code: 1,
+                                            userInfo: nil)))
                 return
             }
             

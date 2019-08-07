@@ -100,10 +100,10 @@ class CitiesViewController: UIViewController {
                         self?.semaphore.signal()
                     }
                 case .failure(let error):
-                    print(error)
                     self?.indicatorView.indicatorStopAnimating()
                     UIApplication.shared.isNetworkActivityIndicatorVisible = false
                     self?.semaphore.signal()
+                    assertionFailure(error.localizedDescription)
                     return
                 }
             }
